@@ -76,12 +76,12 @@
         })
         $(document).on("click",".join-action",function (){
             let code = $(".enter-code").val();
-            let meetingUrl = `${window.location.origin}/?meetingId=${code}`;
+            let meetingUrl = `${window.location.origin}/?meetingID=${code}`;
             window.location.replace(meetingUrl);
         })
         $(document).on("click",".new-meeting",function (){
             let code = Math.floor(Math.random() * 100000000);
-            let meetingUrl = `${window.location.origin}/?meetingId=${code}`;
+            let meetingUrl = `${window.location.origin}/?meetingID=${code}`;
             window.location.replace(meetingUrl);
         })
     })
