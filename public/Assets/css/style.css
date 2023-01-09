@@ -2,6 +2,12 @@ body {
     font-family: Roboto, lato !important;
 }
 
+ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
 .logo{
     height: 43px;
 }
@@ -27,4 +33,23 @@ body {
 
 li.nav-item{
     padding: 0 10px;
+}
+
+.signin-image{
+    height: 390px;
+    border: 25px solid white;
+    border-radius: 5px;
+    box-shadow: 1px 1px 5px gray;
+}
+
+textarea:focus, input:focus{
+    outline: none !important;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+}
+
+.jumbotron{
+    background-color: #fff;
 }
