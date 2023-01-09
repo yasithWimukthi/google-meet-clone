@@ -5,10 +5,10 @@
     <title>Create Or Join Meeting</title>
     <link rel="stylesheet" href="public/Assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="public/Assets/css/style.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet">
 </head>
-<body>
+<body style="padding-top: 3.5rem">
     <nav class="navbar navbar-expand-md fixed-top">
         <img src="public/Assets/images/google-meet-icon.png" alt="logo" class="logo">
         <a href="#" class="navbar-brand text-dark">Google Meet</a>
@@ -42,11 +42,31 @@
         <div class="container w-50">
             <h1 style="font-size: 3rem">Premium video meeting. Now it is available for free to everyone.</h1>
             <p class="lead">Google Meet is a simple, secure, and reliable video conferencing app. It is designed to help you stay connected with your team and your customers, wherever you are.</p>
+            <ul class="display-center justify-content-start">
+                <li style="padding: 0">
+                    <button class="btn btn-lg text-light font-weight-bold display-center" style="background-color: #01796b">
+                        <span class="material-icons mr-2">video_call</span>
+                        New Meeting
+                    </button>
+                </li>
+                <li style="padding: 0 0 0 20px">
+                    <button class="btn btn-lg btn-outline-secondary text-dark font-weight-bold display-center" style="background-color: #fff">
+                        <span class="material-icons mr-2">keyboard</span>
+                        <input type="text" placeholder="Enter a code" style="border: none">
+                    </button>
+                </li>
+                <li class="text-dark pl-2 font-weight-bold cursor-pointer">
+                    Join
+                </li>
+            </ul>
         </div>
         <div class="container w-50">
-
+            <img src="public/Assets/images/google-meet-people.jpg" alt="hero-image" class="signin-image">
         </div>
     </div>
 </main>
+<footer class="container">
+    <h6>Learn more about google meet.</h6>
+</footer>
 </body>
 </html>
