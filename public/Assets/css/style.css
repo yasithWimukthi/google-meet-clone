@@ -84,3 +84,24 @@ textarea:focus, input:focus{
     height: 8vh;
     border-bottom-left-radius: 10px;
 }
+
+.top-left-participant-wrap{
+    position: relative;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+    padding: 5px;
+}
+
+.cursor-pointer:hover{
+    background-color: rgb(226,225,225);
+    border-radius: 5px;
+}
+
+.top-left-participant-count{
+    position: absolute;
+    top: -2px;
+    right: -3px;
+    font-size: 15px;
+}
