@@ -53,3 +53,55 @@ textarea:focus, input:focus{
 .jumbotron{
     background-color: #fff;
 }
+
+.home-wrap{
+    background-color: rgb(31,30,30);
+}
+
+.g-top{
+    height: 90vh;
+    position: relative;
+}
+
+.g-bottom{
+    position: relative;
+    bottom: -649px;
+}
+
+.video-wrap{
+    height: 600px;
+}
+
+.video-wrap>*{
+    flex: 1 1 250px;
+    border: 1px solid white;
+}
+
+.g-top-left{
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 8vh;
+    border-bottom-left-radius: 10px;
+}
+
+.top-left-participant-wrap{
+    position: relative;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+    padding: 5px;
+}
+
+.cursor-pointer:hover{
+    background-color: rgb(226,225,225);
+    border-radius: 5px;
+}
+
+.top-left-participant-count{
+    position: absolute;
+    top: -2px;
+    right: -3px;
+    font-size: 15px;
+}
