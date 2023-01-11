@@ -66,6 +66,10 @@ textarea:focus, input:focus{
 .g-bottom{
     position: relative;
     bottom: -649px;
+    /*margin: 0 -10px !important;*/
+    padding: 0 20px;
+    box-shadow: 0 0 5px black;
+    z-index: 2;
 }
 
 .video-wrap{
@@ -104,4 +108,16 @@ textarea:focus, input:focus{
     top: -2px;
     right: -3px;
     font-size: 15px;
+}
+
+.action-icon-style{
+    font-size:8px !important;
+    height: 40px;
+    width: 40px;
+    border: 1px solid lightgray;
+    border-radius: 50%;
+}
+
+.end-call-wrap{
+
 }
