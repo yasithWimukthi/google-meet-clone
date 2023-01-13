@@ -15,8 +15,10 @@
     <script>
         $(function (){
             const urlParams = new URLSearchParams(window.location.search);
-            const meeting_id = urlParams.get('meetingID');
+            const meeting_id = urlParams.get('meetingID') || 15452;
             const userId = prompt('Enter user ID:');
+
+            console.log(meeting_id,userId);
 
             if (!userId || !meeting_id){
                 alert('Invalid meeting ID or user ID');
