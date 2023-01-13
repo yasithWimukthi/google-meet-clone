@@ -14,6 +14,21 @@ const io = require('socket.io')(server,{
 
 app.use(express.static(path.join(__dirname, '')));
 
+let userConnections = [];
+
 io.on('connection', (socket) => {
     console.log("socket id is: " + socket.id);
+    socket.on('userConnect', (data) => {
+
+        const otherUsers = userConnections.filter((user) => {
+            return user.meetingId === data.meetingId ;
+        });
+
+        userConnections.push({
+            connectionId: socket.id,
+            userId: data.displayName,
+            meetingId: data.meetingId
+        });
+
+    });
 })
