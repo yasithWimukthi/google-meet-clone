@@ -30,5 +30,12 @@ io.on('connection', (socket) => {
             meetingId: data.meetingId
         });
 
+        otherUsers.forEach((user) => {
+            socket.to(user.connectionId).emit('inform_other_about_me', {
+                otherUserId: data.displayName,
+                connectionId: socket.id
+            });
+        });
+
     });
 })

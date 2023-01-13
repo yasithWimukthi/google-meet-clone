@@ -19,6 +19,10 @@ let MyApp = (function (){
                 }
             }
         });
+
+        socket.on('inform_other_about_me', (data) => {
+            addUser(data.otherUserId, data.connectionId);
+        });
     }
 
     return {
