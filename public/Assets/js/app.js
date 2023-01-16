@@ -85,21 +85,14 @@ let AppProcess = (function (){
         serverProcess(JSON.stringify({ 'offer': connection.localDescription }), conId);
     }
 
-    function SDPProcess (data,fromConnid){
-        let connection = peers_connection[fromConnid];
+    async function SDPProcess (data,fromConnid){
+        let message = JSON.parse(data);
+        if (message.answer){
 
-        if (data.sdp) {
-            connection.setRemoteDescription(new RTCSessionDescription(data.sdp)).then(() => {
-                if (data.sdp.type == 'offer') {
-                    connection.createAnswer().then((answer) => {
-                        connection.setLocalDescription(answer).then(() => {
-                            serverProcess(JSON.stringify({ 'answer': connection.localDescription }), fromConnid);
-                        });
-                    });
-                }
-            });
-        } else if (data.candidate) {
-            connection.addIceCandidate(new RTCIceCandidate(data.candidate));
+        }else if (message.offer){
+            if (!peers_connection[fromConnid]) {
+                await setConnection(fromConnid);
+            }
         }
     }
 
