@@ -1,8 +1,10 @@
-let AppProcess = function (){
+let AppProcess = (function (){
     let serverProcess;
     let myConnectionId;
     let peersConnectionIds = [];
     let peers_connection = [];
+    let remote_vid_stream = [];
+    let remote_aud_stream = [];
 
     function _init(SDP_function,myConId){
         serverProcess = SDP_function;
@@ -34,11 +36,44 @@ let AppProcess = function (){
         }
 
         connection.ontrack = (event) => {
+            if (!remote_vid_stream[conId]) {
+                remote_vid_stream[conId].srcObject = new MediaStream();
+            }
 
-        }
+            if (!remote_aud_stream[conId]) {
+                remote_aud_stream[conId].srcObject = new MediaStream();
+            }
+
+            if (event.track.kind == 'video') {
+                remote_vid_stream[conId]
+                    .getVideoTracks()
+                    .forEach((track) => remote_vid_stream[conId].removeTrack(track));
+
+                remote_vid_stream[conId].addTrack(event.track);
+
+                let remoteVideoPlayer = document.getElementById(`v_${conId}`);
+                remoteVideoPlayer.srcObject = null;
+                remoteVideoPlayer.srcObject = remote_vid_stream[conId];
+                remoteVideoPlayer.load();
+            } else if (event.track.kind == 'audio') {
+                remote_aud_stream[conId]
+                    .getAudioTracks()
+                    .forEach((track) => remote_aud_stream[conId].removeTrack(track));
+
+                remote_aud_stream[conId].addTrack(event.track);
+
+                let remoteAudioPlayer = document.getElementById(`a_${conId}`);
+                remoteAudioPlayer.srcObject = null;
+                remoteAudioPlayer.srcObject = remote_aud_stream[conId];
+                remoteAudioPlayer.load();
+            }
+
+        };
 
         peersConnectionIds[conId] = conId;
         peers_connection[conId] = connection;
+
+        return connection;
     }
 
     async function setOffer(conId){
@@ -50,15 +85,36 @@ let AppProcess = function (){
         serverProcess(JSON.stringify({ 'offer': connection.localDescription }), conId);
     }
 
+    function SDPProcess (data,fromConnid){
+        let connection = peers_connection[fromConnid];
+
+        if (data.sdp) {
+            connection.setRemoteDescription(new RTCSessionDescription(data.sdp)).then(() => {
+                if (data.sdp.type == 'offer') {
+                    connection.createAnswer().then((answer) => {
+                        connection.setLocalDescription(answer).then(() => {
+                            serverProcess(JSON.stringify({ 'answer': connection.localDescription }), fromConnid);
+                        });
+                    });
+                }
+            });
+        } else if (data.candidate) {
+            connection.addIceCandidate(new RTCIceCandidate(data.candidate));
+        }
+    }
+
     return {
         setConnection: async (conId) => {
             return await setConnection(conId);
         },
         init: async (SDP_function,myConId) => {
             return await _init(SDP_function,myConId);
+        },
+        processClientFunc: async (data,fromConnid) => {
+            return await SDPProcess(data,fromConnid);
         }
     }
-}
+})();
 
 
 let MyApp = (function (){
@@ -85,7 +141,8 @@ let MyApp = (function (){
 
         socket.on('connect', () => {
             if (socket.connected){
-                AppProcess().init(SdpFunction,socket.id);
+
+                AppProcess.init(SdpFunction,socket.id);
                 if (meetingId && userId){
                     socket.emit('userConnect', {meetingId: meetingId, displayName: userId});
                 }
@@ -94,7 +151,11 @@ let MyApp = (function (){
 
         socket.on('inform_other_about_me', (data) => {
             addUser(data.otherUserId, data.connectionId);
-            AppProcess().setConnection(data.connectionId);
+            AppProcess.setConnection(data.connectionId);
+        });
+
+        socket.on('SDPProcess', async (data) => {
+            await AppProcess.processClientFunc(data.message, data.from_connid);
         });
     }
 
