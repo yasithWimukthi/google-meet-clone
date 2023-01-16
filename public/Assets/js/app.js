@@ -1,6 +1,7 @@
 let AppProcess = function (){
     let serverProcess;
     let myConnectionId;
+    let peersConnectionIds = [];
 
     function _init(SDP_function,myConId){
         serverProcess = SDP_function;
@@ -22,7 +23,7 @@ let AppProcess = function (){
         let connection = new RTCPeerConnection(iceConfig);
 
         connection.onnegotiationneeded = async (event) => {
-            await setOffer(event)
+            await setOffer(conId)
         }
 
         connection.onicecandidate = (event) => {
@@ -30,6 +31,16 @@ let AppProcess = function (){
                 serverProcess(JSON.stringify({ 'candidate': event.candidate }), conId);
             }
         }
+
+        connection.ontrack = (event) => {
+
+        }
+
+        peersConnectionIds[conId] = conId;
+    }
+
+    async function setOffer(conId){
+
     }
 
     return {
