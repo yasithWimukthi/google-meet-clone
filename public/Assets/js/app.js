@@ -25,6 +25,16 @@ let MyApp = (function (){
         });
     }
 
+    const addUser = (otherUserId, connectionId) => {
+        let newDivId = $("#otherTemplate").clone();
+        newDivId = newDivId.attr('id', connectionId).addClass("other");
+        newDivId.find("h2").text(otherUserId);
+        newDivId.find("video").attr('id', `v_${connectionId}`);
+        newDivId.find("audio").attr('id', `a_${connectionId}`);
+        newDivId.show();
+        $("#divUsers").append(newDivId);
+    }
+
     return {
         _init: function (uid,mid){
             init(uid,mid);
