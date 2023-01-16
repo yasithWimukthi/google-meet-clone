@@ -8,7 +8,7 @@ let AppProcess = function (){
             {
                 urls: 'stun:stun1.l.google.com:19302',
             }
-            ]
+        ]
     }
 
     function setConnection(conId){
