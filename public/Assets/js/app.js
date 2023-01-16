@@ -1,3 +1,28 @@
+let AppProcess = function (){
+
+    let iceConfig = {
+        iceServers: [
+            {
+                urls: 'stun:stun.l.google.com:19302'
+            },
+            {
+                urls: 'stun:stun1.l.google.com:19302',
+            }
+            ]
+    }
+
+    function setConnection(conId){
+        let connection = new RTCPeerConnection(iceConfig);
+    }
+
+    return {
+        setConnection: async (conId) => {
+            return await setConnection(conId);
+        }
+    }
+}
+
+
 let MyApp = (function (){
     let socket = null;
     let meetingId = null;
@@ -22,6 +47,7 @@ let MyApp = (function (){
 
         socket.on('inform_other_about_me', (data) => {
             addUser(data.otherUserId, data.connectionId);
+            AppProcess().setConnection(data.connectionId);
         });
     }
 
