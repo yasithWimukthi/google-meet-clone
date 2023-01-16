@@ -85,12 +85,33 @@ let AppProcess = (function (){
         serverProcess(JSON.stringify({ 'offer': connection.localDescription }), conId);
     }
 
+    function SDPProcess (data,fromConnid){
+        let connection = peers_connection[fromConnid];
+
+        if (data.sdp) {
+            connection.setRemoteDescription(new RTCSessionDescription(data.sdp)).then(() => {
+                if (data.sdp.type == 'offer') {
+                    connection.createAnswer().then((answer) => {
+                        connection.setLocalDescription(answer).then(() => {
+                            serverProcess(JSON.stringify({ 'answer': connection.localDescription }), fromConnid);
+                        });
+                    });
+                }
+            });
+        } else if (data.candidate) {
+            connection.addIceCandidate(new RTCIceCandidate(data.candidate));
+        }
+    }
+
     return {
         setConnection: async (conId) => {
             return await setConnection(conId);
         },
         init: async (SDP_function,myConId) => {
             return await _init(SDP_function,myConId);
+        },
+        processClientFunc: async (data,fromConnid) => {
+            return await SDPProcess(data,fromConnid);
         }
     }
 })();
@@ -131,6 +152,10 @@ let MyApp = (function (){
         socket.on('inform_other_about_me', (data) => {
             addUser(data.otherUserId, data.connectionId);
             AppProcess.setConnection(data.connectionId);
+        });
+
+        socket.on('SDPProcess', async (data) => {
+            await AppProcess.processClientFunc(data.message, data.from_connid);
         });
     }
 
