@@ -2,6 +2,7 @@ let AppProcess = function (){
     let serverProcess;
     let myConnectionId;
     let peersConnectionIds = [];
+    let peers_connection = [];
 
     function _init(SDP_function,myConId){
         serverProcess = SDP_function;
@@ -37,10 +38,16 @@ let AppProcess = function (){
         }
 
         peersConnectionIds[conId] = conId;
+        peers_connection[conId] = connection;
     }
 
     async function setOffer(conId){
+        let connection = peers_connection[conId];
+        let offer = await connection.createOffer();
 
+        await connection.setLocalDescription(offer);
+
+        serverProcess(JSON.stringify({ 'offer': connection.localDescription }), conId);
     }
 
     return {
