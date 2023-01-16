@@ -1,4 +1,11 @@
 let AppProcess = function (){
+    let serverProcess;
+    let myConnectionId;
+
+    function _init(SDP_function,myConId){
+        serverProcess = SDP_function;
+        myConnectionId = myConId;
+    }
 
     let iceConfig = {
         iceServers: [
@@ -13,11 +20,24 @@ let AppProcess = function (){
 
     function setConnection(conId){
         let connection = new RTCPeerConnection(iceConfig);
+
+        connection.onnegotiationneeded = async (event) => {
+            await setOffer(event)
+        }
+
+        connection.onicecandidate = (event) => {
+            if (event.candidate) {
+                serverProcess(JSON.stringify({ 'candidate': event.candidate }), conId);
+            }
+        }
     }
 
     return {
         setConnection: async (conId) => {
             return await setConnection(conId);
+        },
+        init: async (SDP_function,myConId) => {
+            return await _init(SDP_function,myConId);
         }
     }
 }
@@ -37,8 +57,17 @@ let MyApp = (function (){
 
     const eventProcessForSignalingServer = () => {
         socket = io.connect();
+
+        const SdpFunction = (data,toConId) => {
+            socket.emit('SDPProcess', {
+                message: data,
+                to_connid: toConId
+            });
+        }
+
         socket.on('connect', () => {
             if (socket.connected){
+                AppProcess().init(SdpFunction,socket.id);
                 if (meetingId && userId){
                     socket.emit('userConnect', {meetingId: meetingId, displayName: userId});
                 }
