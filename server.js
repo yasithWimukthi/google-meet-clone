@@ -37,6 +37,8 @@ io.on('connection', (socket) => {
             });
         });
 
+        socket.emit('inform_me_about_others', otherUsers);
+
     });
 
     socket.on('SDPProcess', (data) => {
