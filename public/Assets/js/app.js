@@ -15,6 +15,7 @@ let AppProcess = (function (){
         SCREEN: 2
     };
     let videoState = videoStates.NONE;
+    let videoCamTrack;
 
     async function _init(SDP_function,myConId){
         serverProcess = SDP_function;
@@ -86,21 +87,39 @@ let AppProcess = (function (){
         // });
     }
 
-    async function videoProcess(state){
-        // if(state === videoStates.NONE){
-        //     await loadVideo();
-        //     if(!video){
-        //         alert("Video permission has not been granted");
-        //         return;
-        //     }
-        //     videoState = videoStates.VIDEO;
-        //     $("#videoCamOnOff").html('<span class="material-icons">videocam</span>');
-        //     updateMediaSenders(video,rtpVidSenders);
-        // }else{
-        //     videoState = videoStates.NONE;
-        //     $("#videoCamOnOff").html('<span class="material-icons">videocam_off</span>');
-        //     removeMediaSenders(rtpVidSenders);
-        // }
+    async function videoProcess(newVideoState){
+        try {
+            let videoStream = null;
+            if (newVideoState == videoStates.VIDEO){
+                videoStream = await navigator.mediaDevices.getUserMedia({
+                    video:{
+                        width: 1920,
+                        height: 1080
+                    },
+                    audio:false
+                })
+            }else if (newVideoState == videoStates.SCREEN){
+                videoStream = await navigator.mediaDevices.getDisplayMedia({
+                    video:{
+                        width: 1920,
+                        height: 1080
+                    },
+                    audio:false
+                })
+            }
+
+            if (videoStream && videoStream.getVideoTracks().length > 0) {
+                videoCamTrack = videoStream.getVideoTracks()[0];
+                if (videoCamTrack){
+                    localDiv.srcObject = new MediaStream([videoCamTrack]);
+                }
+            }
+        }catch (e) {
+            console.log(e);
+            return;
+        }
+
+        videoState = newVideoState;
     }
 
     let iceConfig = {
