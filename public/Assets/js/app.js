@@ -88,9 +88,11 @@ let AppProcess = (function (){
     }
 
     async function videoProcess(newVideoState){
+        console.log("videoProcess");
         try {
             let videoStream = null;
             if (newVideoState == videoStates.VIDEO){
+                console.log("videoProcess: video");
                 videoStream = await navigator.mediaDevices.getUserMedia({
                     video:{
                         width: 1920,
@@ -112,6 +114,7 @@ let AppProcess = (function (){
                 videoCamTrack = videoStream.getVideoTracks()[0];
                 if (videoCamTrack){
                     localDiv.srcObject = new MediaStream([videoCamTrack]);
+                    alert("Video stream has been started");
                 }
             }
         }catch (e) {
