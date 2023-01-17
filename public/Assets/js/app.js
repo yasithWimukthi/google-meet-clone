@@ -5,10 +5,61 @@ let AppProcess = (function (){
     let peers_connection = [];
     let remote_vid_stream = [];
     let remote_aud_stream = [];
+    let localDiv;
+    let audio;
+    let isAudioMuted = true;
+    let rtpAudSenders = [];
 
     async function _init(SDP_function,myConId){
         serverProcess = SDP_function;
         myConnectionId = myConId;
+        eventProcess();
+        localDiv = document.getElementById('localVideoPlayer');
+    }
+
+    function eventProcess(){
+        $("#micMuteUnmute").on('click',async function(){
+            if(!audio){
+                await loadAudio();
+            }
+            if(!audio){
+                alert("Audio permission has not been granted");
+                return;
+            }
+            if(isAudioMuted){
+                audio.enabled = true;
+                $(this).html('<span class="material-icons">mic</span>');
+                updateMediaSenders(audio,rtpAudSenders);
+            }else{
+                audio.enabled = false;
+                $(this).html('<span class="material-icons">mic-off</span>');
+                removeMediaSenders(rtpAudSenders);
+            }
+        });
+
+    }
+
+    function loadAudio(){
+        return new Promise((resolve,reject)=>{
+            navigator.mediaDevices.getUserMedia({audio:true,video:false}).then((stream)=>{
+                audio = stream;
+                resolve();
+            }).catch((err)=>{
+                console.log(err);
+            });
+        });
+    }
+
+    function updateMediaSenders(stream,senders){
+        senders.forEach((sender)=>{
+            sender.replaceTrack(stream.getTracks()[0]);
+        });
+    }
+
+    function removeMediaSenders(senders){
+        senders.forEach((sender)=>{
+            sender.replaceTrack(null);
+        });
     }
 
     let iceConfig = {
