@@ -6,7 +6,7 @@ let AppProcess = (function (){
     let remote_vid_stream = [];
     let remote_aud_stream = [];
 
-    function _init(SDP_function,myConId){
+    async function _init(SDP_function,myConId){
         serverProcess = SDP_function;
         myConnectionId = myConId;
     }
@@ -22,7 +22,7 @@ let AppProcess = (function (){
         ]
     }
 
-    function setConnection(conId){
+    async function setConnection(conId){
         let connection = new RTCPeerConnection(iceConfig);
 
         connection.onnegotiationneeded = async (event) => {
@@ -88,14 +88,24 @@ let AppProcess = (function (){
     async function SDPProcess (data,fromConnid){
         let message = JSON.parse(data);
         if (message.answer){
-
+            await peers_connection[fromConnid].setRemoteDescription(new RTCSessionDescription(message.answer));
         }else if (message.offer){
             if (!peers_connection[fromConnid]) {
                 await setConnection(fromConnid);
             }
+            await peers_connection[fromConnid].setRemoteDescription(new RTCSessionDescription(message.offer));
             let answer = await peers_connection[fromConnid].createAnswer();
             await peers_connection[fromConnid].setLocalDescription(answer);
             serverProcess(JSON.stringify({ 'answer': answer }), fromConnid);
+        }else if (message.icecandidate){
+            if (!peers_connection[fromConnid]) {
+                await setConnection(fromConnid);
+            }
+            try {
+                await peers_connection[fromConnid].addIceCandidate(new RTCIceCandidate(message.icecandidate));
+            }catch (e) {
+                console.log(e);
+            }
         }
     }
 
