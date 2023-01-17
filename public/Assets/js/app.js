@@ -9,6 +9,12 @@ let AppProcess = (function (){
     let audio;
     let isAudioMuted = true;
     let rtpAudSenders = [];
+    let videoStates = {
+        NONE: 0,
+        VIDEO: 1,
+        SCREEN: 2
+    };
+    let videoState = videoStates.NONE;
 
     async function _init(SDP_function,myConId){
         serverProcess = SDP_function;
@@ -35,31 +41,66 @@ let AppProcess = (function (){
                 $(this).html('<span class="material-icons">mic-off</span>');
                 removeMediaSenders(rtpAudSenders);
             }
+
+            isAudioMuted = !isAudioMuted;
+        });
+
+        $("#videoCamOnOff").on('click',async function(){
+            if (videoState === videoStates.NONE) {
+                await videoProcess(videoStates.NONE);
+            }else {
+                await videoProcess(videoStates.VIDEO);
+            }
+        });
+
+        $("#btnScreenShareOnOff").on('click',async function(){
+            if (videoState === videoStates.SCREEN) {
+                await videoProcess(videoStates.NONE);
+            }else {
+                await videoProcess(videoStates.SCREEN);
+            }
         });
 
     }
 
     function loadAudio(){
-        return new Promise((resolve,reject)=>{
-            navigator.mediaDevices.getUserMedia({audio:true,video:false}).then((stream)=>{
-                audio = stream;
-                resolve();
-            }).catch((err)=>{
-                console.log(err);
-            });
-        });
+        // return new Promise((resolve,reject)=>{
+        //     navigator.mediaDevices.getUserMedia({audio:true,video:false}).then((stream)=>{
+        //         audio = stream;
+        //         resolve();
+        //     }).catch((err)=>{
+        //         console.log(err);
+        //     });
+        // });
     }
 
     function updateMediaSenders(stream,senders){
-        senders.forEach((sender)=>{
-            sender.replaceTrack(stream.getTracks()[0]);
-        });
+        // senders.forEach((sender)=>{
+        //     sender.replaceTrack(stream.getTracks()[0]);
+        // });
     }
 
     function removeMediaSenders(senders){
-        senders.forEach((sender)=>{
-            sender.replaceTrack(null);
-        });
+        // senders.forEach((sender)=>{
+        //     sender.replaceTrack(null);
+        // });
+    }
+
+    async function videoProcess(state){
+        // if(state === videoStates.NONE){
+        //     await loadVideo();
+        //     if(!video){
+        //         alert("Video permission has not been granted");
+        //         return;
+        //     }
+        //     videoState = videoStates.VIDEO;
+        //     $("#videoCamOnOff").html('<span class="material-icons">videocam</span>');
+        //     updateMediaSenders(video,rtpVidSenders);
+        // }else{
+        //     videoState = videoStates.NONE;
+        //     $("#videoCamOnOff").html('<span class="material-icons">videocam_off</span>');
+        //     removeMediaSenders(rtpVidSenders);
+        // }
     }
 
     let iceConfig = {
