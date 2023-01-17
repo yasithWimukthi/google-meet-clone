@@ -93,6 +93,9 @@ let AppProcess = (function (){
             if (!peers_connection[fromConnid]) {
                 await setConnection(fromConnid);
             }
+            let answer = await peers_connection[fromConnid].createAnswer();
+            await peers_connection[fromConnid].setLocalDescription(answer);
+            serverProcess(JSON.stringify({ 'answer': answer }), fromConnid);
         }
     }
 
