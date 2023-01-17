@@ -30,6 +30,10 @@ let AppProcess = (function (){
                 audio.enabled = true;
                 $(this).html('<span class="material-icons">mic</span>');
                 updateMediaSenders(audio,rtpAudSenders);
+            }else{
+                audio.enabled = false;
+                $(this).html('<span class="material-icons">mic-off</span>');
+                removeMediaSenders(rtpAudSenders);
             }
         });
 
@@ -49,6 +53,12 @@ let AppProcess = (function (){
     function updateMediaSenders(stream,senders){
         senders.forEach((sender)=>{
             sender.replaceTrack(stream.getTracks()[0]);
+        });
+    }
+
+    function removeMediaSenders(senders){
+        senders.forEach((sender)=>{
+            sender.replaceTrack(null);
         });
     }
 
