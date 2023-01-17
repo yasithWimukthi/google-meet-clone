@@ -160,6 +160,15 @@ let MyApp = (function (){
             AppProcess.setConnection(data.connectionId);
         });
 
+        socket.on('inform_me_about_others', (otherUsers) => {
+            if (otherUsers) {
+                for (let i = 0; i < otherUsers.length; i++) {
+                    addUser(otherUsers[i].userId, otherUsers[i].connectionId);
+                    AppProcess.setConnection(otherUsers[i].connectionId);
+                }
+            }
+        });
+
         socket.on('SDPProcess', async (data) => {
             await AppProcess.processClientFunc(data.message, data.from_connid);
         });
