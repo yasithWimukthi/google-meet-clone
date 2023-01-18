@@ -48,9 +48,9 @@ let AppProcess = (function (){
 
         $("#videoCamOnOff").on('click',async function(){
             if (videoState === videoStates.NONE) {
-                await videoProcess(videoStates.NONE);
-            }else {
                 await videoProcess(videoStates.VIDEO);
+            }else {
+                await videoProcess(videoStates.NONE);
             }
         });
 
@@ -245,6 +245,9 @@ let MyApp = (function (){
     function init(uid,mid){
         userId = uid;
         meetingId = mid;
+        $("#meetingContainer").show();
+        $("#me h2").text(`${userId} (Me)`);
+        document.title = `Meeting: ${meetingId} - ${userId}`;
         eventProcessForSignalingServer();
     }
 
