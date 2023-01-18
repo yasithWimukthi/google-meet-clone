@@ -16,6 +16,7 @@ let AppProcess = (function (){
     };
     let videoState = videoStates.NONE;
     let videoCamTrack;
+    let rtpVidSenders = [];
 
     async function _init(SDP_function,myConId){
         serverProcess = SDP_function;
@@ -115,6 +116,7 @@ let AppProcess = (function (){
                 if (videoCamTrack){
                     localDiv.srcObject = new MediaStream([videoCamTrack]);
                     alert("Video stream has been started");
+                    updateMediaSenders(videoCamTrack, rtpVidSenders);
                 }
             }
         }catch (e) {
@@ -188,6 +190,12 @@ let AppProcess = (function (){
         peers_connection[conId] = connection;
 
         return connection;
+
+        if (videoState == videoStates.VIDEO || videoState == videoStates.SCREEN) {
+            if (videoCamTrack) {
+                updateMediaSenders(videoCamTrack, rtpVidSenders);
+            }
+        }
     }
 
     async function setOffer(conId){
