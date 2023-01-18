@@ -121,3 +121,13 @@ textarea:focus, input:focus{
 .end-call-wrap{
 
 }
+
+.top-remote-video-show-wrap{
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+video{
+    border: 1px solid grey;
+}
