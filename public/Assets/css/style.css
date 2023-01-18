@@ -130,4 +130,5 @@ textarea:focus, input:focus{
 
 video{
     border: 1px solid grey;
+    width: 300px;
 }

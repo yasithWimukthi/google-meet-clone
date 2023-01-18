@@ -91,9 +91,15 @@ let AppProcess = (function () {
     }
 
     function updateMediaSenders(stream, senders) {
-        // senders.forEach((sender)=>{
-        //     sender.replaceTrack(stream.getTracks()[0]);
-        // });
+        for (let connectionId in peersConnectionIds) {
+            if (connectionStatus(connectionId)) {
+                if (senders[connectionId] && senders[connectionId].track) {
+                    senders[connectionId].replaceTrack(stream);
+                }else {
+                    senders[connectionId] = peers_connection[connectionId].addTrack(stream);
+                }
+            }
+        }
     }
 
     function removeMediaSenders(senders) {
