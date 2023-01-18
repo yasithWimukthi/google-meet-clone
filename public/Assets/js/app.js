@@ -1,4 +1,4 @@
-let AppProcess = (function (){
+let AppProcess = (function () {
     let serverProcess;
     let myConnectionId;
     let peersConnectionIds = [];
@@ -18,27 +18,27 @@ let AppProcess = (function (){
     let videoCamTrack;
     let rtpVidSenders = [];
 
-    async function _init(SDP_function,myConId){
+    async function _init(SDP_function, myConId) {
         serverProcess = SDP_function;
         myConnectionId = myConId;
         eventProcess();
         localDiv = document.getElementById('localVideoPlayer');
     }
 
-    function eventProcess(){
-        $("#micMuteUnmute").on('click',async function(){
-            if(!audio){
+    function eventProcess() {
+        $("#micMuteUnmute").on('click', async function () {
+            if (!audio) {
                 await loadAudio();
             }
-            if(!audio){
+            if (!audio) {
                 alert("Audio permission has not been granted");
                 return;
             }
-            if(isAudioMuted){
+            if (isAudioMuted) {
                 audio.enabled = true;
                 $(this).html('<span class="material-icons">mic</span>');
-                updateMediaSenders(audio,rtpAudSenders);
-            }else{
+                updateMediaSenders(audio, rtpAudSenders);
+            } else {
                 audio.enabled = false;
                 $(this).html('<span class="material-icons">mic-off</span>');
                 removeMediaSenders(rtpAudSenders);
@@ -47,25 +47,25 @@ let AppProcess = (function (){
             isAudioMuted = !isAudioMuted;
         });
 
-        $("#videoCamOnOff").on('click',async function(){
+        $("#videoCamOnOff").on('click', async function () {
             if (videoState === videoStates.NONE) {
                 await videoProcess(videoStates.VIDEO);
-            }else {
+            } else {
                 await videoProcess(videoStates.NONE);
             }
         });
 
-        $("#btnScreenShareOnOff").on('click',async function(){
+        $("#btnScreenShareOnOff").on('click', async function () {
             if (videoState === videoStates.SCREEN) {
                 await videoProcess(videoStates.NONE);
-            }else {
+            } else {
                 await videoProcess(videoStates.SCREEN);
             }
         });
 
     }
 
-    function loadAudio(){
+    function loadAudio() {
         // return new Promise((resolve,reject)=>{
         //     navigator.mediaDevices.getUserMedia({audio:true,video:false}).then((stream)=>{
         //         audio = stream;
@@ -76,50 +76,64 @@ let AppProcess = (function (){
         // });
     }
 
-    function updateMediaSenders(stream,senders){
+    function connectionStatus(connection) {
+        if (connection &&
+            (
+                connection.connectionState === 'connected' ||
+                connection.connectionState === 'connecting' ||
+                connection.connectionState === 'new'
+            )) {
+            return true;
+
+        } else {
+            return false;
+        }
+    }
+
+    function updateMediaSenders(stream, senders) {
         // senders.forEach((sender)=>{
         //     sender.replaceTrack(stream.getTracks()[0]);
         // });
     }
 
-    function removeMediaSenders(senders){
+    function removeMediaSenders(senders) {
         // senders.forEach((sender)=>{
         //     sender.replaceTrack(null);
         // });
     }
 
-    async function videoProcess(newVideoState){
+    async function videoProcess(newVideoState) {
         console.log("videoProcess");
         try {
             let videoStream = null;
-            if (newVideoState == videoStates.VIDEO){
+            if (newVideoState == videoStates.VIDEO) {
                 console.log("videoProcess: video");
                 videoStream = await navigator.mediaDevices.getUserMedia({
-                    video:{
+                    video: {
                         width: 1920,
                         height: 1080
                     },
-                    audio:false
+                    audio: false
                 })
-            }else if (newVideoState == videoStates.SCREEN){
+            } else if (newVideoState == videoStates.SCREEN) {
                 videoStream = await navigator.mediaDevices.getDisplayMedia({
-                    video:{
+                    video: {
                         width: 1920,
                         height: 1080
                     },
-                    audio:false
+                    audio: false
                 })
             }
 
             if (videoStream && videoStream.getVideoTracks().length > 0) {
                 videoCamTrack = videoStream.getVideoTracks()[0];
-                if (videoCamTrack){
+                if (videoCamTrack) {
                     localDiv.srcObject = new MediaStream([videoCamTrack]);
                     alert("Video stream has been started");
                     updateMediaSenders(videoCamTrack, rtpVidSenders);
                 }
             }
-        }catch (e) {
+        } catch (e) {
             console.log(e);
             return;
         }
@@ -138,7 +152,7 @@ let AppProcess = (function (){
         ]
     }
 
-    async function setConnection(conId){
+    async function setConnection(conId) {
         let connection = new RTCPeerConnection(iceConfig);
 
         connection.onnegotiationneeded = async (event) => {
@@ -147,7 +161,7 @@ let AppProcess = (function (){
 
         connection.onicecandidate = (event) => {
             if (event.candidate) {
-                serverProcess(JSON.stringify({ 'candidate': event.candidate }), conId);
+                serverProcess(JSON.stringify({'candidate': event.candidate}), conId);
             }
         }
 
@@ -198,34 +212,34 @@ let AppProcess = (function (){
         }
     }
 
-    async function setOffer(conId){
+    async function setOffer(conId) {
         let connection = peers_connection[conId];
         let offer = await connection.createOffer();
 
         await connection.setLocalDescription(offer);
 
-        serverProcess(JSON.stringify({ 'offer': connection.localDescription }), conId);
+        serverProcess(JSON.stringify({'offer': connection.localDescription}), conId);
     }
 
-    async function SDPProcess (data,fromConnid){
+    async function SDPProcess(data, fromConnid) {
         let message = JSON.parse(data);
-        if (message.answer){
+        if (message.answer) {
             await peers_connection[fromConnid].setRemoteDescription(new RTCSessionDescription(message.answer));
-        }else if (message.offer){
+        } else if (message.offer) {
             if (!peers_connection[fromConnid]) {
                 await setConnection(fromConnid);
             }
             await peers_connection[fromConnid].setRemoteDescription(new RTCSessionDescription(message.offer));
             let answer = await peers_connection[fromConnid].createAnswer();
             await peers_connection[fromConnid].setLocalDescription(answer);
-            serverProcess(JSON.stringify({ 'answer': answer }), fromConnid);
-        }else if (message.icecandidate){
+            serverProcess(JSON.stringify({'answer': answer}), fromConnid);
+        } else if (message.icecandidate) {
             if (!peers_connection[fromConnid]) {
                 await setConnection(fromConnid);
             }
             try {
                 await peers_connection[fromConnid].addIceCandidate(new RTCIceCandidate(message.icecandidate));
-            }catch (e) {
+            } catch (e) {
                 console.log(e);
             }
         }
@@ -235,22 +249,22 @@ let AppProcess = (function (){
         setConnection: async (conId) => {
             return await setConnection(conId);
         },
-        init: async (SDP_function,myConId) => {
-            return await _init(SDP_function,myConId);
+        init: async (SDP_function, myConId) => {
+            return await _init(SDP_function, myConId);
         },
-        processClientFunc: async (data,fromConnid) => {
-            return await SDPProcess(data,fromConnid);
+        processClientFunc: async (data, fromConnid) => {
+            return await SDPProcess(data, fromConnid);
         }
     }
 })();
 
 
-let MyApp = (function (){
+let MyApp = (function () {
     let socket = null;
     let meetingId = null;
     let userId = null;
 
-    function init(uid,mid){
+    function init(uid, mid) {
         userId = uid;
         meetingId = mid;
         $("#meetingContainer").show();
@@ -263,7 +277,7 @@ let MyApp = (function (){
     const eventProcessForSignalingServer = () => {
         socket = io.connect();
 
-        const SdpFunction = (data,toConId) => {
+        const SdpFunction = (data, toConId) => {
             socket.emit('SDPProcess', {
                 message: data,
                 to_connid: toConId
@@ -271,10 +285,10 @@ let MyApp = (function (){
         }
 
         socket.on('connect', () => {
-            if (socket.connected){
+            if (socket.connected) {
 
-                AppProcess.init(SdpFunction,socket.id);
-                if (meetingId && userId){
+                AppProcess.init(SdpFunction, socket.id);
+                if (meetingId && userId) {
                     socket.emit('userConnect', {meetingId: meetingId, displayName: userId});
                 }
             }
@@ -310,8 +324,8 @@ let MyApp = (function (){
     }
 
     return {
-        _init: function (uid,mid){
-            init(uid,mid);
+        _init: function (uid, mid) {
+            init(uid, mid);
         }
 
     }
