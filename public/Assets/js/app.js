@@ -108,6 +108,7 @@ let AppProcess = (function () {
         // });
     }
 
+
     async function videoProcess(newVideoState) {
         console.log("videoProcess");
         try {
