@@ -110,7 +110,12 @@ let AppProcess = (function () {
 
 
     async function videoProcess(newVideoState) {
-        console.log("videoProcess");
+        if (newVideoState === videoStates.NONE) {
+            $("#videoCamOnOff").html('<span class="material-icons">videocam_off</span>');
+        }
+        if (newVideoState === videoStates.VIDEO) {
+            $("#videoCamOnOff").html('<span class="material-icons">videocam_on</span>');
+        }
         try {
             let videoStream = null;
             if (newVideoState == videoStates.VIDEO) {
@@ -210,13 +215,14 @@ let AppProcess = (function () {
         peersConnectionIds[conId] = conId;
         peers_connection[conId] = connection;
 
-        return connection;
 
         if (videoState == videoStates.VIDEO || videoState == videoStates.SCREEN) {
             if (videoCamTrack) {
                 updateMediaSenders(videoCamTrack, rtpVidSenders);
             }
         }
+
+        return connection;
     }
 
     async function setOffer(conId) {
