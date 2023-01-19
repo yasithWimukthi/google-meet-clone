@@ -66,15 +66,16 @@ let AppProcess = (function () {
     }
 
     function loadAudio() {
-        // return new Promise((resolve,reject)=>{
-        //     navigator.mediaDevices.getUserMedia({audio:true,video:false}).then((stream)=>{
-        //         audio = stream;
-        //         resolve();
-        //     }).catch((err)=>{
-        //         console.log(err);
-        //     });
-        // });
+        return new Promise((resolve,reject)=>{
+            navigator.mediaDevices.getUserMedia({audio:true,video:false}).then((stream)=>{
+                audio = stream;
+                resolve();
+            }).catch((err)=>{
+                console.log(err);
+            });
+        });
     }
+
 
     function connectionStatus(connection) {
         if (connection &&
