@@ -103,15 +103,29 @@ let AppProcess = (function () {
     }
 
     function removeMediaSenders(senders) {
-        // senders.forEach((sender)=>{
-        //     sender.replaceTrack(null);
-        // });
+        for (let connectionId in peersConnectionIds) {
+            if(senders[connectionId] && connectionStatus(peers_connection[connectionId])){
+                peers_connection[connectionId].removeTrack(senders[connectionId]);
+                senders[connectionId] = null;
+            }
+        }
     }
 
+    function removeVideoStream(rtpVidSenders) {
+        if (videoCamTrack){
+            videoCamTrack.stop();
+            videoCamTrack = null;
+            localDiv.srcObject = null;
+            removeMediaSenders(rtpVidSenders);
+        }
+    }
 
     async function videoProcess(newVideoState) {
         if (newVideoState === videoStates.NONE) {
             $("#videoCamOnOff").html('<span class="material-icons">videocam_off</span>');
+            videoState = newVideoState;
+
+            removeVideoStream(rtpVidSenders);
         }
         if (newVideoState === videoStates.VIDEO) {
             $("#videoCamOnOff").html('<span class="material-icons">videocam_on</span>');
