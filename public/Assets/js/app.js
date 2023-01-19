@@ -36,11 +36,11 @@ let AppProcess = (function () {
             }
             if (isAudioMuted) {
                 audio.enabled = true;
-                $(this).html('<span class="material-icons">mic</span>');
+                $(this).html('<span class="material-icons" style="width: 100%">mic</span>');
                 updateMediaSenders(audio, rtpAudSenders);
             } else {
                 audio.enabled = false;
-                $(this).html('<span class="material-icons">mic-off</span>');
+                $(this).html('<span class="material-icons" style="width: 100%">mic_off</span>');
                 removeMediaSenders(rtpAudSenders);
             }
 
@@ -66,14 +66,16 @@ let AppProcess = (function () {
     }
 
     function loadAudio() {
-        return new Promise((resolve,reject)=>{
-            navigator.mediaDevices.getUserMedia({audio:true,video:false}).then((stream)=>{
-                audio = stream;
-                resolve();
-            }).catch((err)=>{
-                console.log(err);
+        try {
+            let audioStream = navigator.mediaDevices.getUserMedia({
+                video: false,
+                audio: true
             });
-        });
+            audio = audioStream.getAudioTracks()[0];
+            audio.enabled = false;
+        }catch (e) {
+            console.log(e);
+        }
     }
 
 
